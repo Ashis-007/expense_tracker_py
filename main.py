@@ -1,58 +1,12 @@
 from datetime import date
 from sys import exit
-import sqlite3 as sql
-
-class Database:
-
-    def __init__(self):
-        self.__conn = sql.connect("expense.db")
-        self.__cur = self.__conn.cursor()
-        self.create_table()
-
-
-    def create_table(self):
-        try:
-            self.__cur.execute("""
-            CREATE TABLE IF NOT EXISTS 
-            expenses(ID INTEGER PRIMARY AUTOINCREMENT, 
-            AMOUNT INTEGER NOT NULL, 
-            NOTE TEXT,
-            DATE INTEGER NOT NULL)
-            """)
-            print("Table created successfully!")
-            return True
-        except:
-            print("Could not create table for DB")
-            return False
-
-
-    def insert_data(self, data):
-        try:
-            self.__cur.execute("INSERT INTO expenses(AMOUNT, NOTE, DATE) VALUES(?, ?, ?)", data)
-            return True
-        except:
-            print("Could not insert data into DB")
-            return False
-
-
-    def fetch_all_data(self):
-        try:
-            with self.__conn:
-                self.__cur.execute("SELECT AMOUNT, NOTE, DATE FROM expenses")
-                return self.__cur.fetchall()
-        except:
-            print("Could not fetch data from DB!")
-            return False
-
-
-# amount
-# note/description
-# date
+from database import Database
 
 def input_expense():
     amount = int(input("Enter amount: "))
     note = input("Enter note/desciption: ")
     current_date = date.today().strftime("%d/%m/%y")
+    return [amount, note, current_date]
 
 
 def show_menu():
@@ -62,18 +16,32 @@ def show_menu():
     press 2 to see all expenses
     press 3 to see all expenses by given date
     press 4 to export your expenses into an excel file
+    press 5 to exit
     """)
 
 
-def save_to_db(amount, note, current_date):
-    pass
-
-
 if __name__ == "__main__":
+    db = Database() # instance of class Database
+
     print("=== Welcome to your own personalised Expense_Tracker! ===")
-    choice = 4
-    while choice is not 4:
-        pass
-    else:
+    choice = 0
+    while choice is not 5:
         show_menu()
+        choice = int(input("Choose your option: "))
+        if choice == 5:
+            continue
+        elif choice == 1:
+            data = input_expense()
+            db.insert_data(data)
+        elif choice == 2:
+            data = db.fetch_all_data()
+            print(data)
+        elif choice == 3:
+            pass
+        elif choice == 4:
+            pass
+        else:
+            print("Invalid option selected. Please try again.")
+    else:
+        db.close_connection()
         exit("Program closed")
