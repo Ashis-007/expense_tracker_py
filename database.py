@@ -28,8 +28,8 @@ class Database:
             self.__cur.execute("INSERT INTO expenses(amount, note, date) VALUES(?, ?, ?)", data)
             self.__conn.commit()
             return True
-        except Exception:
-            print("Could not insert data into DB")
+        except Exception as err:
+            print("Could not insert data into DB", err)
             return False
 
 
@@ -38,8 +38,18 @@ class Database:
             self.__cur.execute("SELECT amount, note, date FROM expenses")
             self.__conn.commit()
             return self.__cur.fetchall()
-        except:
-            print("Could not fetch data from DB!")
+        except Exception as err:
+            print("Could not fetch data from DB!", err)
+            return False
+
+
+    def delete_all_data(self):
+        try:
+            self.__cur.execute("DROP TABLE expenses")
+            self.__conn.commit()
+            return True
+        except Exception as err:
+            print("Could not delete data from DB!", err)
             return False
 
 
